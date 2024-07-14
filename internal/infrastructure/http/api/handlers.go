@@ -9,17 +9,17 @@ import (
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/mappers"
 )
 
-type TransactionHandler struct {
-	transactionUseCase usecases.TransactionUseCase
+type PaymentHandler struct {
+	paymentUseCase usecases.PaymentUseCase
 }
 
 type RefundHandler struct {
 	refundUseCase usecases.RefundUseCase
 }
 
-func NewTransactionHandler(transactionUseCase usecases.TransactionUseCase) *TransactionHandler {
-	return &TransactionHandler{
-		transactionUseCase: transactionUseCase,
+func NewTransactionHandler(paymentUseCase usecases.PaymentUseCase) *PaymentHandler {
+	return &PaymentHandler{
+		paymentUseCase: paymentUseCase,
 	}
 }
 
@@ -29,27 +29,32 @@ func NewRefundHandler(refundUseCase usecases.RefundUseCase) *RefundHandler {
 	}
 }
 
-func (txHandler *TransactionHandler) Create(ctx *gin.Context) {
-	req := requests.NewCreditCardRequest()
+func (paymentHandler *PaymentHandler) Create(ctx *gin.Context) {
+	req := requests.NewPaymentRequestRequest()
 	if err := ctx.BindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	entityTransaction, err := mappers.FromCreditCardRequestToTransactionEntity(req)
+	entityTransaction, err := mappers.FromPaymentRequestToTransactionEntity(req)
+
+	// TODO: call http_client
+
 	if err != nil {
 		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"errors": err.Error()})
 		return
 	}
 
-	savedTransaction, err := txHandler.transactionUseCase.Create(entityTransaction)
-	// TODO: transactionResponse => mappers
+	savedTransaction, err := paymentHandler.paymentUseCase.Create(entityTransaction)
+
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
+	
+	paymentResponse := mappers.FromTransactionEntityToResponse(*savedTransaction)
 
-	ctx.JSON(http.StatusCreated, savedTransaction)
+	ctx.JSON(http.StatusCreated, paymentResponse)
 }
 
 func (refundHandler *RefundHandler) Create(ctx *gin.Context) {

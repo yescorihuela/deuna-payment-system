@@ -2,11 +2,14 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/yescorihuela/deuna-payment-system/internal/application"
+	"github.com/yescorihuela/deuna-payment-system/internal/application/payment_gateway"
 	"github.com/yescorihuela/deuna-payment-system/internal/application/usecases"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/databases"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/api"
+	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/requests"
+	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/responses"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/repositories"
+	http_client "github.com/yescorihuela/deuna-payment-system/internal/infrastructure/services/http"
 )
 
 func main() {
@@ -19,14 +22,17 @@ func main() {
 	pgTransactionRepository := repositories.NewPostgresqlTransactionRepository(db)
 
 	pgRefundRepository := repositories.NewPostgresqlRefundRepository(db)
+	httpClient := http_client.NewHttpClient[requests.PaymentRequest, responses.PaymentResponse](http_client.HttpClientSettings{})
+	paymentProcessUseCase := usecases.NewPaymentProcess(
+		pgTransactionRepository,
+		httpClient,
+	)
+	refundUseCase := usecases.NewRefundUseCase(pgRefundRepository)
 
-	txUseCase := usecases.NewTransaction(pgTransactionRepository)
-	refundUseCase := usecases.NewRefund(pgRefundRepository)
-
-	txHandler := api.NewTransactionHandler(txUseCase)
+	txHandler := api.NewTransactionHandler(paymentProcessUseCase)
 	refundHandler := api.NewRefundHandler(refundUseCase)
 
-	txApp := application.NewApplication(
+	txApp := payment_gateway.NewApplication(
 		txHandler,
 		refundHandler,
 		gin.Default())

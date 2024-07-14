@@ -14,7 +14,7 @@ type refundUseCase struct {
 	refundRepository refund.RefundRepository
 }
 
-func NewRefund(refundRepository refund.RefundRepository) RefundUseCase {
+func NewRefundUseCase(refundRepository refund.RefundRepository) RefundUseCase {
 	return &refundUseCase{
 		refundRepository,
 	}

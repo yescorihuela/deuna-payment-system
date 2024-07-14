@@ -3,22 +3,31 @@ package mappers
 import (
 	"time"
 
+	"github.com/yescorihuela/deuna-payment-system/internal/domain/constants"
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/entities"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/requests"
+	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/responses"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/models"
 )
 
-func FromCreditCardRequestToTransactionEntity(request requests.CreditCardRequest) (entities.Transaction, error) {
-	return entities.Transaction{}, nil
+func FromPaymentRequestToTransactionEntity(request requests.PaymentRequest) (entities.Transaction, error) {
+
+	// TODO: Validate credit card number
+	newTxId := entities.NewUlid()
+	txNow := time.Now().UTC()
+	txEntity := entities.Transaction{
+		Id:           newTxId,
+		MerchantCode: request.MerchantCode,
+		Amount:       request.Amount,
+		Status:       constants.PENDING,
+		CreatedAt:    txNow,
+	}
+	return txEntity, nil
 }
 
 func FromRefundRequestToRefundEntity(request requests.RefundRequest) (entities.Refund, error) {
 	return entities.Refund{}, nil
 }
-
-func FromTransactionEntityToModel() {}
-
-func FromTransactionModelToEntity() {}
 
 func FromRefundModelToEntity(refund models.Refund) entities.Refund {
 	return entities.Refund{
@@ -64,10 +73,14 @@ func FromMerchantEntityToModel(merchant entities.Merchant) models.Merchant {
 		NotificationEmail: merchant.NotificationEmail,
 		MerchantCode:      merchant.MerchantCode,
 		Enabled:           merchant.Enabled,
-		
 	}
 }
 
-func FromMerchantModelToEntity() {
-
+func FromTransactionEntityToResponse(transaction entities.Transaction) responses.PaymentResponse {
+	return responses.PaymentResponse{
+		Id:        transaction.Id,
+		Amount:    transaction.Amount,
+		Status:    transaction.Status,
+		CreatedAt: transaction.CreatedAt,
+	}
 }

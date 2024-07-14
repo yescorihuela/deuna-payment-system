@@ -1,4 +1,4 @@
-package application
+package payment_gateway
 
 import (
 	"github.com/gin-gonic/gin"
@@ -6,13 +6,13 @@ import (
 )
 
 type Application struct {
-	txHandler     *api.TransactionHandler
+	txHandler     *api.PaymentHandler
 	refundHandler *api.RefundHandler
 	router        *gin.Engine
 }
 
 func NewApplication(
-	txHandler *api.TransactionHandler,
+	txHandler *api.PaymentHandler,
 	refundHandler *api.RefundHandler,
 	router *gin.Engine,
 ) *Application {
@@ -34,6 +34,6 @@ func (app *Application) Bootstrapping() {
 
 func (app *Application) Run() error {
 	app.Bootstrapping()
-	err := app.router.Run()
+	err := app.router.Run() // add port from config
 	return err
 }

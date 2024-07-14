@@ -26,7 +26,7 @@ func (r *PostgresqlRefundRepository) Create(refund entities.Refund) (*models.Ref
 			(transaction_id, merchant_id, amount, status, created_at)
 		VALUES
 			($1, $2, $3, $4, $5)
-		RETURNING *
+		RETURNING *;
 	`)
 	err := r.db.QueryRow(query,
 		refund.TransactionId,
