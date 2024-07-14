@@ -1,11 +1,14 @@
 package merchant
 
-import "github.com/yescorihuela/deuna-payment-system/internal/domain/entities"
+import (
+	"github.com/yescorihuela/deuna-payment-system/internal/domain/entities"
+	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/models"
+)
 
 type MerchantRepository interface {
-	Create(merchant entities.Merchant) (*entities.Merchant, error)
-	GetByMerchantCode(merchantCode string) (*entities.Merchant, error)
-	GetById(id int) (*entities.Merchant, error)
-	DisableMerchant(merchantCode string) error
-	Update(id int, merchant entities.Merchant) (*entities.Merchant, error)
+	Create(merchant entities.Merchant) (*models.Merchant, error)
+	GetByMerchantCode(merchantCode string) (*models.Merchant, error)
+	GetById(id int) (*models.Merchant, error)
+	DisableMerchant(merchantCode string, isEnabled bool) error
+	Update(id int, merchant entities.Merchant) (*models.Merchant, error)
 }

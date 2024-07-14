@@ -7,6 +7,6 @@ import (
 
 var spaceEater = regexp.MustCompile(`\s+`)
 
-func compact(queryStmt string) string {
+func Compact(queryStmt string) string {
 	return spaceEater.ReplaceAllString(strings.TrimSpace(queryStmt), "")
 }

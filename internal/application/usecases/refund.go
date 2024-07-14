@@ -2,7 +2,8 @@ package usecases
 
 import (
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/entities"
-	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/repositories"
+	"github.com/yescorihuela/deuna-payment-system/internal/domain/repositories/refund"
+	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/mappers"
 )
 
 type RefundUseCase interface {
@@ -10,16 +11,17 @@ type RefundUseCase interface {
 }
 
 type refundUseCase struct {
-	refundRepository repositories.PostgresqlRefundRepository
+	refundRepository refund.RefundRepository
 }
 
-func NewRefund(refundRepository repositories.PostgresqlRefundRepository) RefundUseCase {
+func NewRefund(refundRepository refund.RefundRepository) RefundUseCase {
 	return &refundUseCase{
 		refundRepository,
 	}
 }
 
 func (uc *refundUseCase) Create(refund entities.Refund) (*entities.Refund, error) {
-	ref, err := uc.refundRepository.Create(refund)
-	return ref, err
+	refundModel, err := uc.refundRepository.Create(refund)
+	refundEntity := mappers.FromRefundModelToEntity(*refundModel)
+	return &refundEntity, err
 }

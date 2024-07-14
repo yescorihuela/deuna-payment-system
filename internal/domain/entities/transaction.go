@@ -2,6 +2,8 @@ package entities
 
 import "time"
 
+
+
 type Transaction struct {
 	Id         string
 	MerchantId string

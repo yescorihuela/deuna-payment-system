@@ -17,9 +17,20 @@ func main() {
 	defer db.Close()
 
 	pgTransactionRepository := repositories.NewPostgresqlTransactionRepository(db)
+
+	pgRefundRepository := repositories.NewPostgresqlRefundRepository(db)
+
 	txUseCase := usecases.NewTransaction(pgTransactionRepository)
+	refundUseCase := usecases.NewRefund(pgRefundRepository)
+
 	txHandler := api.NewTransactionHandler(txUseCase)
-	txApp := application.NewApplication(txHandler, gin.Default())
+	refundHandler := api.NewRefundHandler(refundUseCase)
+
+	txApp := application.NewApplication(
+		txHandler,
+		refundHandler,
+		gin.Default())
+
 	if err := txApp.Run(); err != nil {
 		panic(err)
 	}

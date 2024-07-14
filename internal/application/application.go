@@ -6,22 +6,26 @@ import (
 )
 
 type Application struct {
-	txHandler *api.TransactionHandler
-	router    *gin.Engine
+	txHandler     *api.TransactionHandler
+	refundHandler *api.RefundHandler
+	router        *gin.Engine
 }
 
 func NewApplication(
 	txHandler *api.TransactionHandler,
+	refundHandler *api.RefundHandler,
 	router *gin.Engine,
 ) *Application {
 	return &Application{
-		txHandler: txHandler,
-		router:    router,
+		txHandler:     txHandler,
+		refundHandler: refundHandler,
+		router:        router,
 	}
 }
 
 func (app *Application) RegisterRoutes() {
-	app.router.POST("/transaction/new", app.txHandler.Create)
+	app.router.POST("/payments/new", app.txHandler.Create)
+	app.router.POST("/payments/refund", app.refundHandler.Create)
 }
 
 func (app *Application) Bootstrapping() {
