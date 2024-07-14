@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/yescorihuela/deuna-payment-system/internal/application/usecases"
+	usecases "github.com/yescorihuela/deuna-payment-system/internal/application/usecases/payment_gateway"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/requests"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/mappers"
 )
@@ -51,7 +51,7 @@ func (paymentHandler *PaymentHandler) Create(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
-	
+
 	paymentResponse := mappers.FromTransactionEntityToResponse(*savedTransaction)
 
 	ctx.JSON(http.StatusCreated, paymentResponse)

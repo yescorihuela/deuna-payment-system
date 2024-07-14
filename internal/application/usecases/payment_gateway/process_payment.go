@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/constants"
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/entities"
@@ -39,10 +40,14 @@ func (uc *paymentUseCase) Create(transaction entities.Transaction) (*entities.Tr
 	}
 	// TODO: solve this
 	var req requests.PaymentRequest
-	_, err = uc.httpClient.Post(ctx, "payment-process", req)
+	res, err := uc.httpClient.Post(ctx, "payment-process", req)
+
 	if err != nil {
 		uc.transactionRepository.SetTransactionStatus(transaction.MerchantCode, transaction.Id, constants.REJECTED)
 		return nil, err
+	}
+	if res.StatusCode == http.StatusOK || res.StatusCode == http.StatusCreated {
+		uc.transactionRepository.SetTransactionStatus(transaction.MerchantCode, transaction.Id, constants.APPROVED)
 	}
 	return tx, err
 }

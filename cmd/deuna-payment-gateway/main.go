@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/yescorihuela/deuna-payment-system/internal/application/payment_gateway"
-	"github.com/yescorihuela/deuna-payment-system/internal/application/usecases"
+	usecases "github.com/yescorihuela/deuna-payment-system/internal/application/usecases/payment_gateway"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/databases"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/api"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/requests"
