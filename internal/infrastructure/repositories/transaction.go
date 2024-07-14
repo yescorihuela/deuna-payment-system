@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 
+	"github.com/yescorihuela/deuna-payment-system/internal/domain/entities"
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/repositories/transaction"
 )
 
@@ -14,4 +15,8 @@ func NewPostgresqlTransactionRepository(db *sql.DB) transaction.TransactionRepos
 	return &PostgresqlTransactionRepository{
 		db: db,
 	}
+}
+
+func (r *PostgresqlTransactionRepository) Create(refund entities.Transaction) (*entities.Transaction, error) {
+	return &entities.Transaction{}, nil
 }
