@@ -2,8 +2,10 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
+	"github.com/yescorihuela/deuna-payment-system/internal/domain/constants"
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/entities"
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/repositories/merchant"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/mappers"
@@ -94,7 +96,7 @@ func (r *PostgresqlMerchantRepository) GetById(id int) (*models.Merchant, error)
 	return &merchantModel, nil
 }
 
-func (r *PostgresqlMerchantRepository) DisableMerchant(merchantCode string, isEnabled bool) error {
+func (r *PostgresqlMerchantRepository) SetStatus(merchantCode string, isEnabled bool) error {
 	merchantModel := models.NewMerchantModel()
 	query := shared.Compact(`
 					UPDATE merchants
@@ -110,7 +112,7 @@ func (r *PostgresqlMerchantRepository) DisableMerchant(merchantCode string, isEn
 	return nil
 }
 
-func (r *PostgresqlMerchantRepository) Update(id int, merchant entities.Merchant) (*models.Merchant, error) {
+func (r *PostgresqlMerchantRepository) Update(merchantCode string, merchant entities.Merchant) (*models.Merchant, error) {
 	merchantModel := models.NewMerchantModel()
 	query := shared.Compact(`
 					UPDATE merchants
@@ -123,7 +125,7 @@ func (r *PostgresqlMerchantRepository) Update(id int, merchant entities.Merchant
 						created_at = $6,
 						updated_at = $7
 					WHERE
-						id = $8
+						merchant_code = $8
 					RETURNING *
 				`)
 	err := r.db.QueryRow(query,
@@ -134,11 +136,59 @@ func (r *PostgresqlMerchantRepository) Update(id int, merchant entities.Merchant
 		merchant.Enabled,
 		merchant.CreatedAt.UTC(),
 		time.Now().UTC(),
-		id,
+		merchantCode,
 	).Scan(&merchantModel.Id, &merchantModel.Name, &merchantModel.Balance, &merchantModel.NotificationEmail, &merchantModel.MerchantCode, &merchantModel.Enabled, &merchantModel.CreatedAt, &merchantModel.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
 	return &merchantModel, nil
 
+}
+
+func (r *PostgresqlMerchantRepository) ExecuteTransaction(merchantCode, kindTransaction string, amount float64) error {
+	var isMerchantEnabled bool
+	var merchantBalance float64
+	query := shared.Compact(`
+			SELECT
+				enabled,
+				balance
+			FROM 
+				merchants 
+			WHERE merchant_code = $1
+		`)
+	err := r.db.QueryRow(query, merchantCode).Scan(&isMerchantEnabled, &merchantBalance)
+	if errors.Is(err, sql.ErrNoRows) {
+		return err
+	}
+	if isMerchantEnabled {
+		switch kindTransaction {
+		case constants.DEPOSIT:
+			merchantBalance += amount
+			query = shared.Compact(`
+				UPDATE merchants
+					SET balance = $1
+				WHERE merchant_code = $2`)
+			err := r.db.QueryRow(query, merchantCode).Scan()
+			if err != nil {
+				return err
+			}
+		case constants.REFUND:
+			if merchantBalance >= amount {
+				merchantBalance -= amount
+				query = shared.Compact(`
+				UPDATE merchants
+					SET balance = $1
+				WHERE merchant_code = $2`)
+				err := r.db.QueryRow(query, merchantCode).Scan()
+				if err != nil {
+					return err
+				}
+			} else {
+				return errors.New("insufficient funds")
+			}
+		}
+	} else {
+		return errors.New("merchant is disabled for executing transactions")
+	}
+	return nil
 }

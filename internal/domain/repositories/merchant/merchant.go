@@ -9,6 +9,7 @@ type MerchantRepository interface {
 	Create(merchant entities.Merchant) (*models.Merchant, error)
 	GetByMerchantCode(merchantCode string) (*models.Merchant, error)
 	GetById(id int) (*models.Merchant, error)
-	DisableMerchant(merchantCode string, isEnabled bool) error
-	Update(id int, merchant entities.Merchant) (*models.Merchant, error)
+	SetStatus(merchantCode string, isEnabled bool) error
+	Update(merchantCode string, merchant entities.Merchant) (*models.Merchant, error)
+	ExecuteTransaction(merchantCode, kindTransaction string, amount float64) error
 }

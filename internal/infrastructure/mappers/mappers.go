@@ -76,6 +76,17 @@ func FromMerchantEntityToModel(merchant entities.Merchant) models.Merchant {
 	}
 }
 
+func FromMerchantModelToEntity(merchant models.Merchant) entities.Merchant {
+	return entities.Merchant{
+		Id:                merchant.Id,
+		Name:              merchant.Name,
+		Balance:           merchant.Balance,
+		NotificationEmail: merchant.NotificationEmail,
+		MerchantCode:      merchant.MerchantCode,
+		Enabled:           merchant.Enabled,
+	}
+}
+
 func FromTransactionEntityToResponse(transaction entities.Transaction) responses.PaymentResponse {
 	return responses.PaymentResponse{
 		Id:        transaction.Id,

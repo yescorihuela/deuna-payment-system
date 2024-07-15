@@ -6,4 +6,8 @@ const (
 	DECLINED  = "DECLINED"
 	REJECTED  = "REJECTED"
 	PROCESSED = "PROCESSED"
+
+	// Types of operations
+	DEPOSIT = "DEPOSIT"
+	REFUND  = "REFUND"
 )

@@ -3,6 +3,7 @@ package acquiring_bank
 import (
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/entities"
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/repositories/merchant"
+	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/mappers"
 )
 
 type MerchantUseCase interface {
@@ -11,6 +12,7 @@ type MerchantUseCase interface {
 	SetStatus(merchantCode string, isEnabled bool) error
 	GetByMerchantCode(merchantCode string) (*entities.Merchant, error)
 	GetById(id string) (*entities.Merchant, error)
+	ExecuteTransaction(merchantCode, transactionType string, amount float64) error
 }
 
 type merchantUseCase struct {
@@ -24,21 +26,52 @@ func NewMerchantUseCase(merchantRepository merchant.MerchantRepository) Merchant
 }
 
 func (uc *merchantUseCase) Create(merchant entities.Merchant) (*entities.Merchant, error) {
-	return nil, nil
+	merchantModel, err := uc.merchantRepository.Create(merchant)
+	if err != nil {
+		return nil, err
+	}
+	merchantEntity := mappers.FromMerchantModelToEntity(*merchantModel)
+
+	return &merchantEntity, nil
 }
 
 func (uc *merchantUseCase) Update(merchantCode string, merchant entities.Merchant) (*entities.Merchant, error) {
-	return nil, nil
+	merchantModel, err := uc.merchantRepository.Update(merchantCode, merchant)
+	if err != nil {
+		return nil, err
+	}
+	merchantEntity := mappers.FromMerchantModelToEntity(*merchantModel)
+
+	return &merchantEntity, nil
 }
 
 func (uc *merchantUseCase) SetStatus(merchantCode string, isEnabled bool) error {
+	err := uc.merchantRepository.SetStatus(merchantCode, isEnabled)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (uc *merchantUseCase) GetByMerchantCode(merchantCode string) (*entities.Merchant, error) {
-	return nil, nil
+	merchantModel, err := uc.merchantRepository.GetByMerchantCode(merchantCode)
+	if err != nil {
+		return nil, err
+	}
+	merchantEntity := mappers.FromMerchantModelToEntity(*merchantModel)
+	return &merchantEntity, nil
 }
 
 func (uc *merchantUseCase) GetById(id string) (*entities.Merchant, error) {
-	return nil, nil
+	merchantModel, err := uc.merchantRepository.GetByMerchantCode(id)
+	if err != nil {
+		return nil, err
+	}
+	merchantEntity := mappers.FromMerchantModelToEntity(*merchantModel)
+	return &merchantEntity, nil
+}
+
+func (uc *merchantUseCase) ExecuteTransaction(merchantCode, transactionType string, amount float64) error {
+	return uc.merchantRepository.ExecuteTransaction(merchantCode, transactionType, amount)
 }
