@@ -1,25 +1,31 @@
 package acquiring_bank_simulator
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/api/handlers"
+)
 
 type Application struct {
-	router *gin.Engine
+	merchantHandler *handlers.AcquiringBankHandler
+	router          *gin.Engine
 }
 
 func NewApplication(
+	merchantHandler *handlers.AcquiringBankHandler,
 	router *gin.Engine,
 ) *Application {
 	return &Application{
-		router: router,
+		merchantHandler: merchantHandler,
+		router:          router,
 	}
 }
 
 func (app *Application) RegisterRoutes() {
-	app.router.POST("/merchants/new")
-	app.router.PUT("/merchants/update")
-	app.router.PATCH("/merchants/change_status/:merchant_code")
-	app.router.GET("/merchants/by_code/:merchant_code")
-	app.router.GET("/merchants/by_id/:id")
+	app.router.POST("/merchants/new", app.merchantHandler.New)
+	app.router.PUT("/merchants/update/:merchant_code", app.merchantHandler.Update)
+	app.router.PATCH("/merchants/change_status/:merchant_code", app.merchantHandler.ChangeStatus)
+	app.router.GET("/merchants/by_code/:merchant_code", app.merchantHandler.GetByMerchantCode)
+	app.router.GET("/merchants/by_id/:id", app.merchantHandler.GetById)
 }
 
 func (app *Application) Bootstrapping() {

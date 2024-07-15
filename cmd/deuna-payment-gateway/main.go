@@ -5,7 +5,7 @@ import (
 	"github.com/yescorihuela/deuna-payment-system/internal/application/payment_gateway"
 	usecases "github.com/yescorihuela/deuna-payment-system/internal/application/usecases/payment_gateway"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/databases"
-	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/api"
+	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/api/handlers"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/requests"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/responses"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/repositories"
@@ -29,8 +29,8 @@ func main() {
 	)
 	refundUseCase := usecases.NewRefundUseCase(pgRefundRepository)
 
-	txHandler := api.NewTransactionHandler(paymentProcessUseCase)
-	refundHandler := api.NewRefundHandler(refundUseCase)
+	txHandler := handlers.NewTransactionHandler(paymentProcessUseCase)
+	refundHandler := handlers.NewRefundHandler(refundUseCase)
 
 	txApp := payment_gateway.NewApplication(
 		txHandler,

@@ -84,3 +84,20 @@ func FromTransactionEntityToResponse(transaction entities.Transaction) responses
 		CreatedAt: transaction.CreatedAt,
 	}
 }
+
+func FromRefundEntityToResponse(refund entities.Refund) responses.RefundResponse {
+	return responses.RefundResponse{}
+}
+
+func FromMerchantEntityToResponse(merchant entities.Merchant) responses.MerchantResponse {
+	return responses.MerchantResponse{
+		Id:                merchant.Id,
+		Name:              merchant.Name,
+		Balance:           merchant.Balance,
+		NotificationEmail: merchant.NotificationEmail,
+		MerchantCode:      merchant.MerchantCode,
+		Enabled:           merchant.Enabled,
+		CreatedAt:         merchant.CreatedAt,
+		UpdatedAt:         merchant.UpdatedAt,
+	}
+}

@@ -2,18 +2,18 @@ package payment_gateway
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/api"
+	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/api/handlers"
 )
 
 type Application struct {
-	txHandler     *api.PaymentHandler
-	refundHandler *api.RefundHandler
+	txHandler     *handlers.PaymentHandler
+	refundHandler *handlers.RefundHandler
 	router        *gin.Engine
 }
 
 func NewApplication(
-	txHandler *api.PaymentHandler,
-	refundHandler *api.RefundHandler,
+	txHandler *handlers.PaymentHandler,
+	refundHandler *handlers.RefundHandler,
 	router *gin.Engine,
 ) *Application {
 	return &Application{
