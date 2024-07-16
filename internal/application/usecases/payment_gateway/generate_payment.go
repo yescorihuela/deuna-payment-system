@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/constants"
@@ -9,6 +10,7 @@ import (
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/repositories/transaction"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/requests"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/responses"
+	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/mappers"
 	http_client "github.com/yescorihuela/deuna-payment-system/internal/infrastructure/services/http"
 )
 
@@ -34,7 +36,7 @@ func NewPaymentProcess(
 
 func (uc *paymentUseCase) Create(transaction entities.Transaction, creditCard entities.PaymentData) (*entities.Transaction, error) {
 	ctx := context.Background()
-	tx, err := uc.transactionRepository.Create(transaction)
+	transactionModel, err := uc.transactionRepository.Create(transaction)
 	if err != nil {
 		return nil, err
 	}
@@ -48,18 +50,27 @@ func (uc *paymentUseCase) Create(transaction entities.Transaction, creditCard en
 		MerchantCode:    creditCard.MerchantCode,
 		TransactionType: creditCard.TransactionType,
 	}
-
-	res, err := uc.httpClient.Post(ctx, "transaction", req)
+	res, err := uc.httpClient.Post(ctx, "api/v1/transaction", req)
 
 	if err != nil {
 		uc.transactionRepository.SetTransactionStatus(transaction.MerchantCode, transaction.Id, constants.REJECTED)
 		return nil, err
 	}
-	if res.StatusCode == http.StatusOK || res.StatusCode == http.StatusCreated {
-		uc.transactionRepository.SetTransactionStatus(transaction.MerchantCode, transaction.Id, constants.APPROVED)
 
+	if res.StatusCode == http.StatusOK || res.StatusCode == http.StatusCreated {
+		err := uc.transactionRepository.SetTransactionStatus(transaction.MerchantCode, transaction.Id, constants.APPROVED)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return tx, err
+
+	transactionModel, err = uc.transactionRepository.GetPaymentByTransactionId(transaction.MerchantCode, transaction.Id)
+	fmt.Println("===========>>>", transactionModel, transaction.Id, transaction.MerchantCode)
+	if err != nil {
+		return nil, err
+	}
+	transactionEntity := mappers.FromTransactionModelToEntity(*transactionModel)
+	return &transactionEntity, err
 }
 
 func (uc *paymentUseCase) SetPaymentStatus(merchantCode, transactionId, status string) error {

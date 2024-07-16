@@ -130,7 +130,6 @@ func (acquiringBankHandler *AcquiringBankHandler) ExecuteTransaction(ctx *gin.Co
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": errors.New("transaction type in blank")})
 		return
 	}
-
 	err := acquiringBankHandler.acquiringBankUseCase.ExecuteTransaction(req.MerchantCode, req.TransactionType, req.Amount)
 	if err != nil {
 		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})

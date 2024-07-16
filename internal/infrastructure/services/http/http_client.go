@@ -117,5 +117,4 @@ func returnHttpError(res *http.Response, msg string) *HttpClientError {
 		StatusCodeMessage: statusCode,
 		ErrorMessage:      msg,
 	}
-
 }

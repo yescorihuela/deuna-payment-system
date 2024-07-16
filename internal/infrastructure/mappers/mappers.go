@@ -36,7 +36,7 @@ func FromPaymentRequestToPaymentEntity(request requests.PaymentRequest) entities
 		CardNumber:      request.CardNumber,
 		ExpireDate:      request.ExpireDate,
 		CVV:             request.CVV,
-		MerchantCode:    request.CVV,
+		MerchantCode:    request.MerchantCode,
 		TransactionType: request.TransactionType,
 	}
 }
@@ -135,5 +135,15 @@ func FromMerchantEntityToResponse(merchant entities.Merchant) responses.Merchant
 		Enabled:           merchant.Enabled,
 		CreatedAt:         merchant.CreatedAt,
 		UpdatedAt:         merchant.UpdatedAt,
+	}
+}
+
+func FromTransactionModelToEntity(transaction models.Transaction) entities.Transaction {
+	return entities.Transaction{
+		Id:           transaction.Id,
+		MerchantCode: transaction.MerchantId,
+		Amount:       transaction.Amount,
+		Status:       transaction.Status,
+		CreatedAt:    transaction.CreatedAt,
 	}
 }

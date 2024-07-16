@@ -34,6 +34,7 @@ func main() {
 		Host:    fmt.Sprintf("%s:%s", config.HostAcquiringBank, config.HTTPServiceAcquiringBankPort),
 		Timeout: config.TimeoutHTTPRequests,
 	})
+
 	paymentProcessUseCase := usecases.NewPaymentProcess(
 		pgTransactionRepository,
 		httpClient,

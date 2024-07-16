@@ -3,7 +3,6 @@ package repositories
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/constants"
@@ -140,7 +139,6 @@ func (r *PostgresqlMerchantRepository) Update(merchantCode string, merchant enti
 		merchantCode,
 	).Scan(&merchantModel.Id, &merchantModel.Name, &merchantModel.Balance, &merchantModel.NotificationEmail, &merchantModel.MerchantCode, &merchantModel.Enabled, &merchantModel.CreatedAt, &merchantModel.UpdatedAt)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	return &merchantModel, nil
@@ -156,8 +154,7 @@ func (r *PostgresqlMerchantRepository) ExecuteTransaction(merchantCode, transact
 				balance
 			FROM 
 				merchants 
-			WHERE merchant_code = $1
-		`)
+			WHERE merchant_code = $1`)
 	err := r.db.QueryRow(query, merchantCode).Scan(&isMerchantEnabled, &merchantBalance)
 	if errors.Is(err, sql.ErrNoRows) {
 		return err
@@ -170,7 +167,7 @@ func (r *PostgresqlMerchantRepository) ExecuteTransaction(merchantCode, transact
 				UPDATE merchants
 					SET balance = $1
 				WHERE merchant_code = $2`)
-			err := r.db.QueryRow(query, merchantCode).Scan()
+			_, err := r.db.Query(query, merchantBalance, merchantCode)
 			if err != nil {
 				return err
 			}
@@ -181,7 +178,7 @@ func (r *PostgresqlMerchantRepository) ExecuteTransaction(merchantCode, transact
 				UPDATE merchants
 					SET balance = $1
 				WHERE merchant_code = $2`)
-				err := r.db.QueryRow(query, merchantCode).Scan()
+				_, err := r.db.Query(query, merchantBalance, merchantCode)
 				if err != nil {
 					return err
 				}
