@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/constants"
@@ -30,7 +31,8 @@ func (r *PostgresqlMerchantRepository) Create(merchant entities.Merchant) (*mode
 						(name, balance, notification_email, merchant_code, enabled, created_at, updated_at)
 					VALUES
 						($1, $2, $3, $4, $5, $6, $7)
-					RETURNING *`)
+					RETURNING id, name, balance, notification_email, merchant_code, enabled, created_at, updated_at`)
+
 	err := r.db.QueryRow(query,
 		merchant.Name,
 		merchant.Balance,
@@ -40,6 +42,7 @@ func (r *PostgresqlMerchantRepository) Create(merchant entities.Merchant) (*mode
 		merchant.CreatedAt,
 		merchant.UpdatedAt,
 	).Scan(&model.Id, &model.Name, &model.Balance, &model.NotificationEmail, &model.MerchantCode, &model.Enabled, &model.CreatedAt, &model.UpdatedAt)
+
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +55,7 @@ func (r *PostgresqlMerchantRepository) GetByMerchantCode(merchantCode string) (*
 					SELECT 
 						id, name, balance, notification_email, merchant_code, enabled, created_at, updated_at
 					FROM merchants
-						WHERE merchant_code = $1
-	`)
+						WHERE merchant_code = $1`)
 
 	err := r.db.QueryRow(query, merchantCode).Scan(
 		&merchantModel.Id,
@@ -71,14 +73,13 @@ func (r *PostgresqlMerchantRepository) GetByMerchantCode(merchantCode string) (*
 	return &merchantModel, nil
 }
 
-func (r *PostgresqlMerchantRepository) GetById(id int) (*models.Merchant, error) {
+func (r *PostgresqlMerchantRepository) GetById(id string) (*models.Merchant, error) {
 	merchantModel := models.NewMerchantModel()
 	query := shared.Compact(`
 				SELECT 
 					id, name, balance, notification_email, merchant_code, enabled, created_at, updated_at
 				FROM merchants
-					WHERE id = $1
-	`)
+					WHERE id = $1`)
 
 	err := r.db.QueryRow(query, id).Scan(
 		&merchantModel.Id,
@@ -102,8 +103,8 @@ func (r *PostgresqlMerchantRepository) SetStatus(merchantCode string, isEnabled 
 					UPDATE merchants
 						SET enabled = $1
 					WHERE
-						id = $2
-					RETURNING *
+						merchant_code = $2
+					RETURNING id, name, balance, notification_email, merchant_code, enabled, created_at, updated_at
 				`)
 	err := r.db.QueryRow(query, isEnabled, merchantCode).Scan(&merchantModel.Id, &merchantModel.Name, &merchantModel.Balance, &merchantModel.NotificationEmail, &merchantModel.MerchantCode, &merchantModel.Enabled, &merchantModel.CreatedAt, &merchantModel.UpdatedAt)
 	if err != nil {
@@ -126,7 +127,7 @@ func (r *PostgresqlMerchantRepository) Update(merchantCode string, merchant enti
 						updated_at = $7
 					WHERE
 						merchant_code = $8
-					RETURNING *
+					RETURNING id, name, balance, notification_email, merchant_code, enabled, created_at, updated_at
 				`)
 	err := r.db.QueryRow(query,
 		merchant.Name,
@@ -139,6 +140,7 @@ func (r *PostgresqlMerchantRepository) Update(merchantCode string, merchant enti
 		merchantCode,
 	).Scan(&merchantModel.Id, &merchantModel.Name, &merchantModel.Balance, &merchantModel.NotificationEmail, &merchantModel.MerchantCode, &merchantModel.Enabled, &merchantModel.CreatedAt, &merchantModel.UpdatedAt)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	return &merchantModel, nil

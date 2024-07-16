@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/yescorihuela/deuna-payment-system/internal/application/payment_gateway"
 	usecases "github.com/yescorihuela/deuna-payment-system/internal/application/usecases/payment_gateway"
@@ -29,7 +31,7 @@ func main() {
 
 	pgRefundRepository := repositories.NewPostgresqlRefundRepository(db)
 	httpClient := http_client.NewHttpClient[requests.PaymentRequest, responses.PaymentResponse](http_client.HttpClientSettings{
-		Host:    config.HTTPServiceAcquiringBank,
+		Host:    fmt.Sprintf("%s:%s", config.HostAcquiringBank, config.HTTPServiceAcquiringBankPort),
 		Timeout: config.TimeoutHTTPRequests,
 	})
 	paymentProcessUseCase := usecases.NewPaymentProcess(

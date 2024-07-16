@@ -30,7 +30,7 @@ func NewApplication(
 }
 
 func (app *Application) RegisterRoutes() {
-	v1 := app.router.Group("/v1")
+	v1 := app.router.Group("/api/v1")
 	v1.POST("/payments/new", app.txHandler.Create)
 	v1.POST("/payments/refund", app.refundHandler.Create)
 }

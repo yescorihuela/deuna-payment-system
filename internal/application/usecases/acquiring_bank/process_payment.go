@@ -30,6 +30,7 @@ func (uc *merchantUseCase) Create(merchant entities.Merchant) (*entities.Merchan
 	if err != nil {
 		return nil, err
 	}
+
 	merchantEntity := mappers.FromMerchantModelToEntity(*merchantModel)
 
 	return &merchantEntity, nil
@@ -64,7 +65,7 @@ func (uc *merchantUseCase) GetByMerchantCode(merchantCode string) (*entities.Mer
 }
 
 func (uc *merchantUseCase) GetById(id string) (*entities.Merchant, error) {
-	merchantModel, err := uc.merchantRepository.GetByMerchantCode(id)
+	merchantModel, err := uc.merchantRepository.GetById(id)
 	if err != nil {
 		return nil, err
 	}

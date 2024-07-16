@@ -37,7 +37,6 @@ func (acquiringBankHandler *AcquiringBankHandler) New(ctx *gin.Context) {
 	}
 
 	merchantResponse := mappers.FromMerchantEntityToResponse(*savedMerchant)
-
 	ctx.JSON(http.StatusCreated, merchantResponse)
 
 }
@@ -51,7 +50,7 @@ func (acquiringBankHandler *AcquiringBankHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	merchantEntity := mappers.FromMerchantRequestToEntity(req)
+	merchantEntity := mappers.FromMerchantRequestToEntityUpdate(req)
 
 	updatedMerchant, err := acquiringBankHandler.acquiringBankUseCase.Update(merchantCodeParam, merchantEntity)
 	if err != nil {
@@ -61,7 +60,7 @@ func (acquiringBankHandler *AcquiringBankHandler) Update(ctx *gin.Context) {
 
 	merchantResponse := mappers.FromMerchantEntityToResponse(*updatedMerchant)
 
-	ctx.JSON(http.StatusCreated, merchantResponse)
+	ctx.JSON(http.StatusOK, merchantResponse)
 
 }
 
@@ -70,6 +69,7 @@ func (acquiringBankHandler *AcquiringBankHandler) ChangeStatus(ctx *gin.Context)
 	req := struct {
 		Status bool `json:"status"`
 	}{}
+
 	if err := ctx.BindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -102,13 +102,13 @@ func (acquiringBankHandler *AcquiringBankHandler) GetById(ctx *gin.Context) {
 }
 
 func (acquiringBankHandler *AcquiringBankHandler) GetByMerchantCode(ctx *gin.Context) {
-	merchantCodeParam := ctx.Param("merchant_id")
+	merchantCodeParam := ctx.Param("merchant_code")
 	if strings.TrimSpace(merchantCodeParam) == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "merchant_code param in blank"})
 		return
 	}
 
-	merchantEntity, err := acquiringBankHandler.acquiringBankUseCase.GetById(merchantCodeParam)
+	merchantEntity, err := acquiringBankHandler.acquiringBankUseCase.GetByMerchantCode(merchantCodeParam)
 	if err != nil {
 		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return

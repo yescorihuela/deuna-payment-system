@@ -27,14 +27,14 @@ func NewApplication(
 }
 
 func (app *Application) RegisterRoutes() {
-	v1 := app.router.Group("/v1")
+	v1 := app.router.Group("/api/v1")
 	v1.POST("/merchants/new", app.merchantHandler.New)
 	v1.PUT("/merchants/update/:merchant_code", app.merchantHandler.Update)
 	v1.PATCH("/merchants/change_status/:merchant_code", app.merchantHandler.ChangeStatus)
 	v1.GET("/merchants/by_code/:merchant_code", app.merchantHandler.GetByMerchantCode)
 	v1.GET("/merchants/by_id/:id", app.merchantHandler.GetById)
 
-	app.router.POST("/transaction", app.merchantHandler.ExecuteTransaction)
+	v1.POST("/transaction", app.merchantHandler.ExecuteTransaction)
 }
 
 func (app *Application) Bootstrapping() {
@@ -43,6 +43,6 @@ func (app *Application) Bootstrapping() {
 
 func (app *Application) Run() error {
 	app.Bootstrapping()
-	err := app.router.Run(fmt.Sprintf(":%s", app.config.HTTPServiceAcquiringBank))
+	err := app.router.Run(fmt.Sprintf(":%s", app.config.HTTPServiceAcquiringBankPort))
 	return err
 }

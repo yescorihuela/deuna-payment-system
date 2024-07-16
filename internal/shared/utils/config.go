@@ -5,12 +5,12 @@ import (
 )
 
 type Config struct {
-	HTTPServicePaymentPort   string `mapstructure:"HTTP_SERVICE_PAYMENT_PORT"`
-	HTTPServiceAcquiringBank string `mapstructure:"HTTP_SERVICE_ACQUIRING_BANK"`
-	DeunaDbDsn               string `mapstructure:"DEUNA_DB_DSN"`
-	HostAcquiringBank        string `mapstructure:"HOST_ACQUIRING_BANK"`
-	TimeoutHTTPRequests      string `mapstructure:"TIMEOUT_HTTP_REQUESTS"`
-	PathToMigrations         string `mapstructure:"PATH_TO_MIGRATIONS"`
+	HTTPServicePaymentPort       string `mapstructure:"HTTP_SERVICE_PAYMENT_PORT"`
+	HTTPServiceAcquiringBankPort string `mapstructure:"HTTP_SERVICE_ACQUIRING_BANK"`
+	DeunaDbDsn                   string `mapstructure:"DEUNA_DB_DSN"`
+	HostAcquiringBank            string `mapstructure:"HOST_ACQUIRING_BANK"`
+	TimeoutHTTPRequests          string `mapstructure:"TIMEOUT_HTTP_REQUESTS"`
+	PathToMigrations             string `mapstructure:"PATH_TO_MIGRATIONS"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

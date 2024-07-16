@@ -77,6 +77,19 @@ func FromMerchantRequestToEntity(merchant requests.MerchantRequest) entities.Mer
 	}
 }
 
+func FromMerchantRequestToEntityUpdate(merchant requests.MerchantRequest) entities.Merchant {
+	now := time.Now().UTC()
+	return entities.Merchant{
+		Name:              merchant.Name,
+		Balance:           merchant.Balance,
+		NotificationEmail: merchant.NotificationEmail,
+		MerchantCode:      merchant.MerchantCode,
+		Enabled:           merchant.Enabled,
+		CreatedAt:         now,
+		UpdatedAt:         now,
+	}
+}
+
 func FromMerchantEntityToModel(merchant entities.Merchant) models.Merchant {
 	return models.Merchant{
 		Id:                merchant.Id,
