@@ -1,7 +1,11 @@
 ## Welcome to DEUNA Payment System
 
 ### Introduction
-This development has been created for evaluation purposes. It was designed under **Hexagonal Architecture** (so-called "**Ports and Adapters**"). 
+This development has been created for evaluation purposes. It was designed under **Hexagonal Architecture** (so-called "**Ports and Adapters**").
+
+### Note: Please the document until the end, there are several things WIP.
+(Sorry for the above text in bold)
+
 
 ## Technologies used
 
