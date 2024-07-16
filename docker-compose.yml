@@ -6,6 +6,7 @@ services:
     environment:
       - POSTGRES_USER=deuna
       - POSTGRES_PASSWORD=deuna
+      - POSTGRES_DB=deuna_payment_system
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -100,7 +101,7 @@ func (acquiringBankHandler *AcquiringBankHandler) GetById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, merchantResponse)
 }
 
-func (acquiringBankHandler *AcquiringBankHandler) GetByMerchantCode(ctx *gin.Context){
+func (acquiringBankHandler *AcquiringBankHandler) GetByMerchantCode(ctx *gin.Context) {
 	merchantCodeParam := ctx.Param("merchant_id")
 	if strings.TrimSpace(merchantCodeParam) == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "merchant_code param in blank"})
@@ -116,4 +117,24 @@ func (acquiringBankHandler *AcquiringBankHandler) GetByMerchantCode(ctx *gin.Con
 	merchantResponse := mappers.FromMerchantEntityToResponse(*merchantEntity)
 
 	ctx.JSON(http.StatusOK, merchantResponse)
+}
+
+func (acquiringBankHandler *AcquiringBankHandler) ExecuteTransaction(ctx *gin.Context) {
+	req := requests.NewPaymentRequest()
+	if err := ctx.BindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if req.TransactionType == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": errors.New("transaction type in blank")})
+		return
+	}
+
+	err := acquiringBankHandler.acquiringBankUseCase.ExecuteTransaction(req.MerchantCode, req.TransactionType, req.Amount)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, nil)
 }

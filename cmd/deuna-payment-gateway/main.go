@@ -10,10 +10,16 @@ import (
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/responses"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/repositories"
 	http_client "github.com/yescorihuela/deuna-payment-system/internal/infrastructure/services/http"
+	"github.com/yescorihuela/deuna-payment-system/internal/shared/utils"
 )
 
 func main() {
-	db, err := databases.NewPostgresqlDbConnection()
+	config, err := utils.LoadConfig("../../")
+	if err != nil {
+		panic(err)
+	}
+
+	db, err := databases.NewPostgresqlDbConnection(config)
 	if err != nil {
 		panic(err)
 	}
@@ -22,7 +28,10 @@ func main() {
 	pgTransactionRepository := repositories.NewPostgresqlTransactionRepository(db)
 
 	pgRefundRepository := repositories.NewPostgresqlRefundRepository(db)
-	httpClient := http_client.NewHttpClient[requests.PaymentRequest, responses.PaymentResponse](http_client.HttpClientSettings{})
+	httpClient := http_client.NewHttpClient[requests.PaymentRequest, responses.PaymentResponse](http_client.HttpClientSettings{
+		Host:    config.HTTPServiceAcquiringBank,
+		Timeout: config.TimeoutHTTPRequests,
+	})
 	paymentProcessUseCase := usecases.NewPaymentProcess(
 		pgTransactionRepository,
 		httpClient,

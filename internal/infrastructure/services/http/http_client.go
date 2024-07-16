@@ -8,12 +8,13 @@ import (
 	"io"
 	"net/http"
 	"slices"
+	"strconv"
 	"time"
 )
 
 type HttpClientSettings struct {
 	Host    string
-	Timeout int
+	Timeout string
 }
 
 type httpClient[Request any, Response any] struct {
@@ -58,8 +59,13 @@ func (httpClient *httpClient[Request, Response]) Post(ctx context.Context, url s
 		msg := fmt.Sprintf("Error creating the http post request, error: %v", errReq.Error())
 		return nil, returnHttpError(nil, msg)
 	}
-
-	client := &http.Client{Timeout: time.Duration(httpClient.settings.Timeout) * time.Millisecond}
+	var timeout int
+	if httpClient.settings.Timeout == "" {
+		timeout = 0
+	} else {
+		timeout, _ = strconv.Atoi(httpClient.settings.Timeout)
+	}
+	client := &http.Client{Timeout: time.Duration(timeout) * time.Millisecond}
 	res, errClient := client.Do(request)
 	if errClient != nil {
 		msg := fmt.Sprintf("Error while executing client Do for http post, error: %v", errClient.Error())

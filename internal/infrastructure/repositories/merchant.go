@@ -145,7 +145,7 @@ func (r *PostgresqlMerchantRepository) Update(merchantCode string, merchant enti
 
 }
 
-func (r *PostgresqlMerchantRepository) ExecuteTransaction(merchantCode, kindTransaction string, amount float64) error {
+func (r *PostgresqlMerchantRepository) ExecuteTransaction(merchantCode, transactionType string, amount float64) error {
 	var isMerchantEnabled bool
 	var merchantBalance float64
 	query := shared.Compact(`
@@ -161,7 +161,7 @@ func (r *PostgresqlMerchantRepository) ExecuteTransaction(merchantCode, kindTran
 		return err
 	}
 	if isMerchantEnabled {
-		switch kindTransaction {
+		switch transactionType {
 		case constants.DEPOSIT:
 			merchantBalance += amount
 			query = shared.Compact(`

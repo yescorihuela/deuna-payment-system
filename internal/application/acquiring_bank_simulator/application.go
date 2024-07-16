@@ -26,6 +26,8 @@ func (app *Application) RegisterRoutes() {
 	app.router.PATCH("/merchants/change_status/:merchant_code", app.merchantHandler.ChangeStatus)
 	app.router.GET("/merchants/by_code/:merchant_code", app.merchantHandler.GetByMerchantCode)
 	app.router.GET("/merchants/by_id/:id", app.merchantHandler.GetById)
+
+	app.router.POST("/transaction", app.merchantHandler.ExecuteTransaction)
 }
 
 func (app *Application) Bootstrapping() {

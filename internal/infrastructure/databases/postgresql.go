@@ -2,16 +2,19 @@ package databases
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/yescorihuela/deuna-payment-system/internal/shared/utils"
 
 	_ "github.com/lib/pq"
 )
 
-func NewPostgresqlDbConnection() (*sql.DB, error) {
-	psql, err := sql.Open("postgres", "") // Use envvars or viper
+func NewPostgresqlDbConnection(config utils.Config) (*sql.DB, error) {
+	psql, err := sql.Open("postgres", config.DeunaDbDsn)
 	if err != nil {
 		panic(err)
 	}
@@ -20,7 +23,7 @@ func NewPostgresqlDbConnection() (*sql.DB, error) {
 		panic(err)
 	}
 
-	migration, err := migrate.NewWithDatabaseInstance("", "postgres", migrator)
+	migration, err := migrate.NewWithDatabaseInstance(fmt.Sprintf("file://%s", config.PathToMigrations), "deuna_payments", migrator)
 	if err != nil {
 		panic(err)
 	}

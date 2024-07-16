@@ -10,7 +10,7 @@ import (
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/models"
 )
 
-func FromPaymentRequestToTransactionEntity(request requests.PaymentRequest) (entities.Transaction, error) {
+func FromPaymentRequestToTransactionEntity(request requests.PaymentRequest) entities.Transaction {
 
 	// TODO: Validate credit card number
 	newTxId := entities.NewUlid()
@@ -22,11 +22,23 @@ func FromPaymentRequestToTransactionEntity(request requests.PaymentRequest) (ent
 		Status:       constants.PENDING,
 		CreatedAt:    txNow,
 	}
-	return txEntity, nil
+	return txEntity
 }
 
-func FromRefundRequestToRefundEntity(request requests.RefundRequest) (entities.Refund, error) {
-	return entities.Refund{}, nil
+func FromRefundRequestToRefundEntity(request requests.RefundRequest) entities.Refund {
+	return entities.Refund{}
+}
+
+func FromPaymentRequestToPaymentEntity(request requests.PaymentRequest) entities.PaymentData {
+	return entities.PaymentData{
+		Amount:          request.Amount,
+		Currency:        request.Currency,
+		CardNumber:      request.CardNumber,
+		ExpireDate:      request.ExpireDate,
+		CVV:             request.CVV,
+		MerchantCode:    request.CVV,
+		TransactionType: request.TransactionType,
+	}
 }
 
 func FromRefundModelToEntity(refund models.Refund) entities.Refund {

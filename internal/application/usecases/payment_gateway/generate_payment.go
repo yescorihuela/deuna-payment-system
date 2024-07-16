@@ -13,7 +13,7 @@ import (
 )
 
 type PaymentUseCase interface {
-	Create(transaction entities.Transaction) (*entities.Transaction, error)
+	Create(transaction entities.Transaction, creditCard entities.PaymentData) (*entities.Transaction, error)
 	SetPaymentStatus(merchantCode, transactionId, status string) error
 }
 
@@ -32,15 +32,24 @@ func NewPaymentProcess(
 	}
 }
 
-func (uc *paymentUseCase) Create(transaction entities.Transaction) (*entities.Transaction, error) {
+func (uc *paymentUseCase) Create(transaction entities.Transaction, creditCard entities.PaymentData) (*entities.Transaction, error) {
 	ctx := context.Background()
 	tx, err := uc.transactionRepository.Create(transaction)
 	if err != nil {
 		return nil, err
 	}
 	// TODO: solve this
-	var req requests.PaymentRequest
-	res, err := uc.httpClient.Post(ctx, "payment-process", req)
+	var req = requests.PaymentRequest{
+		Amount:          creditCard.Amount,
+		Currency:        creditCard.Currency,
+		CardNumber:      creditCard.CardNumber,
+		ExpireDate:      creditCard.ExpireDate,
+		CVV:             creditCard.CVV,
+		MerchantCode:    creditCard.MerchantCode,
+		TransactionType: creditCard.TransactionType,
+	}
+
+	res, err := uc.httpClient.Post(ctx, "transaction", req)
 
 	if err != nil {
 		uc.transactionRepository.SetTransactionStatus(transaction.MerchantCode, transaction.Id, constants.REJECTED)
@@ -48,6 +57,7 @@ func (uc *paymentUseCase) Create(transaction entities.Transaction) (*entities.Tr
 	}
 	if res.StatusCode == http.StatusOK || res.StatusCode == http.StatusCreated {
 		uc.transactionRepository.SetTransactionStatus(transaction.MerchantCode, transaction.Id, constants.APPROVED)
+		
 	}
 	return tx, err
 }

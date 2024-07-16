@@ -20,20 +20,16 @@ func NewTransactionHandler(paymentUseCase payment_gateway_usecases.PaymentUseCas
 }
 
 func (paymentHandler *PaymentHandler) Create(ctx *gin.Context) {
-	req := requests.NewPaymentRequestRequest()
+	req := requests.NewPaymentRequest()
 	if err := ctx.BindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	entityTransaction, err := mappers.FromPaymentRequestToTransactionEntity(req)
+	transactionEntity := mappers.FromPaymentRequestToTransactionEntity(req)
+	paymentEntity := mappers.FromPaymentRequestToPaymentEntity(req)
 
-	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"errors": err.Error()})
-		return
-	}
-
-	savedTransaction, err := paymentHandler.paymentUseCase.Create(entityTransaction)
+	savedTransaction, err := paymentHandler.paymentUseCase.Create(transactionEntity, paymentEntity)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
@@ -44,4 +40,3 @@ func (paymentHandler *PaymentHandler) Create(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, paymentResponse)
 }
-

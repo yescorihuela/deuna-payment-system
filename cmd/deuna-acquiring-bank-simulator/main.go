@@ -7,10 +7,17 @@ import (
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/databases"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/http/api/handlers"
 	"github.com/yescorihuela/deuna-payment-system/internal/infrastructure/repositories"
+	"github.com/yescorihuela/deuna-payment-system/internal/shared/utils"
 )
 
 func main() {
-	db, err := databases.NewPostgresqlDbConnection()
+
+	config, err := utils.LoadConfig("../../")
+	if err != nil {
+		panic(err)
+	}
+
+	db, err := databases.NewPostgresqlDbConnection(config)
 	if err != nil {
 		panic(err)
 	}
