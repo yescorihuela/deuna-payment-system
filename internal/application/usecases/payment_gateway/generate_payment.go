@@ -38,7 +38,7 @@ func (uc *paymentUseCase) Create(transaction entities.Transaction, creditCard en
 	if err != nil {
 		return nil, err
 	}
-	// TODO: solve this
+
 	var req = requests.PaymentRequest{
 		Amount:          creditCard.Amount,
 		Currency:        creditCard.Currency,
@@ -57,7 +57,7 @@ func (uc *paymentUseCase) Create(transaction entities.Transaction, creditCard en
 	}
 	if res.StatusCode == http.StatusOK || res.StatusCode == http.StatusCreated {
 		uc.transactionRepository.SetTransactionStatus(transaction.MerchantCode, transaction.Id, constants.APPROVED)
-		
+
 	}
 	return tx, err
 }

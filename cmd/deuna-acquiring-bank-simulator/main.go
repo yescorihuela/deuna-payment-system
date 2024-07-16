@@ -31,6 +31,7 @@ func main() {
 	merchantApp := acquiring_bank_simulator.NewApplication(
 		merchantHandler,
 		gin.Default(),
+		config,
 	)
 
 	if err := merchantApp.Run(); err != nil {

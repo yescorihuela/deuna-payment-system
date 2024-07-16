@@ -44,7 +44,9 @@ func main() {
 	txApp := payment_gateway.NewApplication(
 		txHandler,
 		refundHandler,
-		gin.Default())
+		gin.Default(),
+		config,
+	)
 
 	if err := txApp.Run(); err != nil {
 		panic(err)
