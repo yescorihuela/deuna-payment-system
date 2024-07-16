@@ -32,7 +32,7 @@ func (acquiringBankHandler *AcquiringBankHandler) New(ctx *gin.Context) {
 
 	savedMerchant, err := acquiringBankHandler.acquiringBankUseCase.Create(merchantEntity)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -54,7 +54,7 @@ func (acquiringBankHandler *AcquiringBankHandler) Update(ctx *gin.Context) {
 
 	updatedMerchant, err := acquiringBankHandler.acquiringBankUseCase.Update(merchantCodeParam, merchantEntity)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

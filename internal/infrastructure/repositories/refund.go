@@ -2,6 +2,8 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
+	"fmt"
 
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/entities"
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/repositories/refund"
@@ -23,12 +25,13 @@ func (r *PostgresqlRefundRepository) Create(refund entities.Refund) (*models.Ref
 	refundModel := models.NewRefund()
 	query := shared.Compact(`
 		INSERT INTO refunds
-			(transaction_id, merchant_id, amount, status, created_at)
+			(id, transaction_id, merchant_id, amount, status, created_at)
 		VALUES
-			($1, $2, $3, $4, $5)
+			($1, $2, $3, $4, $5, $6)
 		RETURNING *;
 	`)
 	err := r.db.QueryRow(query,
+		refund.Id,
 		refund.TransactionId,
 		refund.MerchantId,
 		refund.Amount,
@@ -46,4 +49,22 @@ func (r *PostgresqlRefundRepository) Create(refund entities.Refund) (*models.Ref
 		return nil, err
 	}
 	return &refundModel, nil
+}
+
+func (r *PostgresqlRefundRepository) GetRefundByTransactionId(merchantCode, transactionId string) (bool, error) {
+	var refundExists bool
+	query := shared.Compact(`
+	SELECT 
+		EXISTS( 
+			SELECT 
+				1 
+			FROM refunds 
+			WHERE merchant_id = $1 AND transaction_id = $2			
+		)`)
+	err := r.db.QueryRow(query, merchantCode, transactionId).Scan(&refundExists)
+	fmt.Println(err, refundExists)
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, err
+	}
+	return refundExists, nil
 }

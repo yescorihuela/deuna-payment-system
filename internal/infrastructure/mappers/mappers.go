@@ -26,7 +26,16 @@ func FromPaymentRequestToTransactionEntity(request requests.PaymentRequest) enti
 }
 
 func FromRefundRequestToRefundEntity(request requests.RefundRequest) entities.Refund {
-	return entities.Refund{}
+	newRefundId := entities.NewUlid()
+	refundNow := time.Now().UTC()
+	return entities.Refund{
+		Id:            newRefundId,
+		Amount:        request.Amount,
+		TransactionId: request.TransactionId,
+		MerchantId:    request.MerchantId,
+		Status:        constants.PENDING,
+		CreatedAt:     refundNow,
+	}
 }
 
 func FromPaymentRequestToPaymentEntity(request requests.PaymentRequest) entities.PaymentData {

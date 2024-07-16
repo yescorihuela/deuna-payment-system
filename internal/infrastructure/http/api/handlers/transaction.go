@@ -32,7 +32,7 @@ func (paymentHandler *PaymentHandler) Create(ctx *gin.Context) {
 	savedTransaction, err := paymentHandler.paymentUseCase.Create(transactionEntity, paymentEntity)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

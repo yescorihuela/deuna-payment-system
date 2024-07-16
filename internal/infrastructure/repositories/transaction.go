@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/entities"
 	"github.com/yescorihuela/deuna-payment-system/internal/domain/repositories/transaction"
@@ -41,13 +40,11 @@ func (r *PostgresqlTransactionRepository) Create(transaction entities.Transactio
 }
 
 func (r *PostgresqlTransactionRepository) SetTransactionStatus(merchantCode, transactionId, status string) error {
-	fmt.Println(merchantCode, transactionId, status)
 	query := shared.Compact(`
 		UPDATE transactions
 		SET status = $1
 		WHERE merchant_id = $2 AND id = $3`)
 	_, err := r.db.Exec(query, status, merchantCode, transactionId)
-	fmt.Println(merchantCode, transactionId)
 	if err != nil {
 		return err
 	}

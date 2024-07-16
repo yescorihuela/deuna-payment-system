@@ -27,13 +27,12 @@ func (refundHandler *RefundHandler) Create(ctx *gin.Context) {
 	}
 
 	entityRefund := mappers.FromRefundRequestToRefundEntity(req)
-
 	savedRefund, err := refundHandler.refundUseCase.Create(entityRefund)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	responseRefund := mappers.FromRefundEntityToResponse(*savedRefund)
+	responseRefund := mappers.FromTransactionEntityToResponse(*savedRefund)
 	ctx.JSON(http.StatusCreated, responseRefund)
 }

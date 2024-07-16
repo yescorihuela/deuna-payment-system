@@ -167,7 +167,7 @@ func (r *PostgresqlMerchantRepository) ExecuteTransaction(merchantCode, transact
 				UPDATE merchants
 					SET balance = $1
 				WHERE merchant_code = $2`)
-			_, err := r.db.Query(query, merchantBalance, merchantCode)
+			_, err := r.db.Exec(query, merchantBalance, merchantCode)
 			if err != nil {
 				return err
 			}
@@ -178,7 +178,7 @@ func (r *PostgresqlMerchantRepository) ExecuteTransaction(merchantCode, transact
 				UPDATE merchants
 					SET balance = $1
 				WHERE merchant_code = $2`)
-				_, err := r.db.Query(query, merchantBalance, merchantCode)
+				_, err := r.db.Exec(query, merchantBalance, merchantCode)
 				if err != nil {
 					return err
 				}

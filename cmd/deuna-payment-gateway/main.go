@@ -30,16 +30,23 @@ func main() {
 	pgTransactionRepository := repositories.NewPostgresqlTransactionRepository(db)
 
 	pgRefundRepository := repositories.NewPostgresqlRefundRepository(db)
-	httpClient := http_client.NewHttpClient[requests.PaymentRequest, responses.PaymentResponse](http_client.HttpClientSettings{
-		Host:    fmt.Sprintf("%s:%s", config.HostAcquiringBank, config.HTTPServiceAcquiringBankPort),
-		Timeout: config.TimeoutHTTPRequests,
-	})
 
 	paymentProcessUseCase := usecases.NewPaymentProcess(
 		pgTransactionRepository,
-		httpClient,
+		http_client.NewHttpClient[requests.PaymentRequest, responses.PaymentResponse](http_client.HttpClientSettings{
+			Host:    fmt.Sprintf("%s:%s", config.HostAcquiringBank, config.HTTPServiceAcquiringBankPort),
+			Timeout: config.TimeoutHTTPRequests,
+		}),
 	)
-	refundUseCase := usecases.NewRefundUseCase(pgRefundRepository)
+
+	refundUseCase := usecases.NewRefundUseCase(
+		pgRefundRepository,
+		pgTransactionRepository,
+		http_client.NewHttpClient[requests.RefundRequest, responses.RefundResponse](http_client.HttpClientSettings{
+			Host:    fmt.Sprintf("%s:%s", config.HostAcquiringBank, config.HTTPServiceAcquiringBankPort),
+			Timeout: config.TimeoutHTTPRequests,
+		}),
+	)
 
 	txHandler := handlers.NewTransactionHandler(paymentProcessUseCase)
 	refundHandler := handlers.NewRefundHandler(refundUseCase)

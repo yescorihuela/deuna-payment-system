@@ -7,4 +7,5 @@ import (
 
 type RefundRepository interface {
 	Create(refund entities.Refund) (*models.Refund, error)
+	GetRefundByTransactionId(merchantCode, transactionId string) (bool, error)
 }
